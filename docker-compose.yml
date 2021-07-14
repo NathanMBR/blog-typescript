@@ -5,7 +5,7 @@ services:
         image: postgres:13.3-alpine3.14
         restart: always
         environment:
-            POSTGRES_PASSWORD: admin
+            POSTGRES_PASSWORD: ${PG_PASSWORD}
     adminer:
         image: adminer:4.8.1-standalone
         restart: always
@@ -15,4 +15,4 @@ services:
         build: .
         command: npm run start
         ports:
-            - 3000:3000
+            - ${APP_PORT}:${APP_PORT}
