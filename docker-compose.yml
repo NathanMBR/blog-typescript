@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+    db:
+        image: postgres:13.3-alpine3.14
+        restart: always
+        environment:
+            POSTGRES_PASSWORD: admin
+    adminer:
+        image: adminer:4.8.1-standalone
+        restart: always
+        ports:
+            - 8080:8080
+    backend:
+        build: .
+        command: npm run start
+        ports:
+            - 3000:3000
