@@ -9,8 +9,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "ts-node-dev ./src/index.ts",
-    "start": "node ./build/index.js",
-    "test": "jest"
+    "test": "jest",
+    "migrate": "node ./build/database/migrations.js",
+    "start": "node ./build/index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

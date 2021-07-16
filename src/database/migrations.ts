@@ -2,10 +2,10 @@
 import connection from "./connection";
 
 // Tables creation
-const createTables = async (): Promise<void> => {
+const createTables = async () => {
     try {
         await connection.transaction(async transaction => {
-            transaction.raw(
+            await transaction.raw(
                 "CREATE TABLE IF NOT EXISTS categories(" +
                     "id SERIAL NOT NULL, " +
                     "name VARCHAR(50) NOT NULL, " + 
@@ -14,7 +14,7 @@ const createTables = async (): Promise<void> => {
                 ");"
             );
         
-            transaction.raw(
+            await transaction.raw(
                 "CREATE TABLE IF NOT EXISTS articles(" +
                     "id SERIAL NOT NULL, " +
                     "title VARCHAR(100) NOT NULL, " +
@@ -28,7 +28,7 @@ const createTables = async (): Promise<void> => {
                 ");"
             );
         
-            transaction.raw(
+            await transaction.raw(
                 "CREATE TABLE IF NOT EXISTS users(" +
                     "id SERIAL NOT NULL, " +
                     "name VARCHAR(20) NOT NULL, " +
@@ -42,7 +42,7 @@ const createTables = async (): Promise<void> => {
                 ");"
             );
 
-            transaction.raw(
+            await transaction.raw(
                 "CREATE TABLE IF NOT EXISTS commentaries(" +
                     "id SERIAL NOT NULL, " +
                     "commentary TEXT NOT NULL, " +
@@ -54,9 +54,10 @@ const createTables = async (): Promise<void> => {
                 ");"
             );
         });
+        console.log("Tables successfully created!");
     } catch (error) {
         console.error(error);
     }
-}
+};
 
-export default createTables;
+createTables();

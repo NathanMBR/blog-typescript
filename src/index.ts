@@ -1,7 +1,10 @@
 // Instance
-import app from "./instance/app"
+import app from "./instance/app";
 
-// Port
+// Environment variables
+import dotenv from "dotenv";
+dotenv.config();
+
 const { APP_PORT } = process.env;
 
 // Listening
