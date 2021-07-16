@@ -2,11 +2,11 @@
 import express from "express";
 const app = express();
 import cors from "cors";
-import dotenv from "dotenv";
 
 // Settings
+app.use(express.urlencoded({extended: false}));
+app.use(express.json());
 app.use(cors());
-dotenv.config();
 
 // Routes
 import routes from "../routes/routes"
