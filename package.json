@@ -8,9 +8,9 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node-dev ./src/index.ts",
     "test": "jest",
-    "migrate": "node ./build/database/migrations.js",
+    "dev": "ts-node-dev ./src/index.ts",
+    "migrate": "node ./build/scripts/runMigrations.js",
     "start": "node ./build/index.js"
   },
   "dependencies": {
