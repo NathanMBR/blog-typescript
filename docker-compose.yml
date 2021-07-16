@@ -1,18 +1,19 @@
 version: "3"
 
 services:
-    db:
+    ${PG_HOST}:
         image: postgres:13.3-alpine3.14
-        restart: always
+        restart: "no"
         environment:
             POSTGRES_PASSWORD: ${PG_PASSWORD}
-    adminer:
-        image: adminer:4.8.1-standalone
-        restart: always
+            POSTGRES_DB: ${PG_DB}
         ports:
-            - 8080:8080
+            - ${PG_PORT}:5432
     backend:
         build: .
+        restart: "no"
         command: npm run start
         ports:
             - ${APP_PORT}:${APP_PORT}
+        depends_on:
+            - ${PG_HOST}
