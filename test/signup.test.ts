@@ -1,7 +1,7 @@
 // Modules
-import supertest, { Response } from "supertest";
+import supertest, { Response as SuperTestResponse } from "supertest";
 import app from "../src/instance/app";
-import connection from "../src/database/connection";
+import { development as connection } from "../src/database/connection";
 
 // Instance
 const request = supertest(app);
@@ -28,7 +28,7 @@ const signup = async (
     password: string,
     confirmEmail: string = email,
     confirmPassword: string = password
-) => new Promise<Response>(async (resolve: Function, reject: Function) => {
+) => new Promise<SuperTestResponse>(async (resolve: Function, reject: Function) => {
     const user = {
         name,
         email,

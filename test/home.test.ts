@@ -12,7 +12,7 @@ describe("Initial pages testing", () => {
             const response = await request.get("/");
             expect(response.statusCode).toBe(302);
         } catch (error) {
-            throw new Error(error);
+            throw new Error(error as string);
         }
     });
 
@@ -21,7 +21,7 @@ describe("Initial pages testing", () => {
             const response = await request.get("/home");
             expect(response.body.hello).toBe("world");
         } catch (error) {
-            throw new Error(error);
+            throw new Error(error as string);
         }
     });
 });
