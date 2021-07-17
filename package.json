@@ -2,7 +2,7 @@
   "name": "blog-typescript",
   "version": "1.0.0",
   "description": "A simple blog created with TypeScript and other technologies.",
-  "main": "index.js",
+  "main": "./build/index.js",
   "repository": "https://github.com/NathanMBR/blog-typescript.git",
   "author": "Nathan Murillo <nathanmurillodeoliveira@gmail.com>",
   "license": "MIT",
