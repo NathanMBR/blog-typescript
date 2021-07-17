@@ -1,12 +1,12 @@
 // Modules
-import connection from "./connection";
+import { Knex } from "knex";
 import { usersLengths, categoriesLengths, articlesLengths } from "../settings/lengths";
 const { name, email, password, profilePicture } = usersLengths;
 const { category } = categoriesLengths;
 const { title, description } = articlesLengths;
 
 // Tables creation
-const runMigrations = async () => {
+const runMigrations = async (connection: Knex<any, Array<unknown>>) => {
     try {
         await connection.transaction(async transaction => {
             await transaction.raw(

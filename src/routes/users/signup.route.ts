@@ -1,7 +1,7 @@
 // Modules
 import express, { Request, Response } from "express";
 const router = express.Router();
-import connection from "../../database/connection";
+import { production as connection } from "../../database/connection";
 import { hashSync, genSaltSync } from "bcryptjs";
 import slugify from "slugify";
 
