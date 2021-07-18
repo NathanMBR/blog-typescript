@@ -10,7 +10,7 @@
     "build": "tsc",
     "test": "jest",
     "dev": "ts-node-dev ./src/index.ts",
-    "migrate": "node ./build/scripts/runMigrations.js",
+    "migrate": "ts-node ./src/scripts/runMigrations.ts",
     "start": "node ./build/index.js"
   },
   "dependencies": {
@@ -33,7 +33,6 @@
     "@types/pg": "^8.6.1",
     "@types/supertest": "^2.0.11",
     "jest": "^27.0.6",
-    "sqlite3": "^5.0.2",
     "supertest": "^6.1.3",
     "ts-jest": "^27.0.3",
     "ts-node": "^10.1.0",
