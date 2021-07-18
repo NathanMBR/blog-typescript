@@ -37,7 +37,7 @@ const signup = async (
     confirmEmail: UserFormData = email,
     confirmPassword: UserFormData = password
 ) => new Promise<SuperTestResponse>(async (resolve: Function, reject: Function) => {
-    const user = {
+    const user: UserSignup = {
         name,
         email,
         password,
@@ -49,7 +49,7 @@ const signup = async (
         const response = await request.post("/signup").send(user);
         resolve(response);
     } catch (error) {
-        reject(error);
+        reject(error as string);
     }
 });
 
@@ -86,7 +86,7 @@ afterAll(async () => {
 
 // Tests
 describe("User creation tests", () => {
-    it("Should successfully register the account", async () => {
+    it("Should successfully register the account and return 201", async () => {
         const { name, email, password } = successUser;
 
         try {
@@ -101,7 +101,7 @@ describe("User creation tests", () => {
         }
     });
 
-    it("Should not pass with a name that is invalid", async () => {
+    it("Should not register a name that is invalid", async () => {
         try {
             const response = await signup(
                 "",
@@ -114,7 +114,7 @@ describe("User creation tests", () => {
         }
     });
 
-    it("Should not pass with a name that matches with not allowed characters", async () => {
+    it("Should not register a name that matches with not allowed characters", async () => {
         try {
             const response = await signup(
                 "Test-2",
@@ -127,7 +127,7 @@ describe("User creation tests", () => {
         }
     });
 
-    it("Should not pass with a name that has less than three characters", async () => {
+    it("Should not register a name that has less than three characters", async () => {
         try {
             const response = await signup(
                 "Te",
@@ -140,7 +140,7 @@ describe("User creation tests", () => {
         }
     });
 
-    it("Should not pass with an e-mail that is invalid", async () => {
+    it("Should not register an e-mail that is invalid", async () => {
         try {
             const response = await signup(
                 "Test 4",
@@ -153,7 +153,7 @@ describe("User creation tests", () => {
         }
     });
 
-    it("Should not pass with different e-mails", async () => {
+    it("Should not register with different e-mails", async () => {
         try {
             const response = await signup(
                 "Test 5",
@@ -167,7 +167,7 @@ describe("User creation tests", () => {
         }
     });
 
-    it("Should not pass with an already registered account", async () => {
+    it("Should not register an already registered account", async () => {
         const { name, email, password } = repeatedUser;
         try {
             const response = await signup(
@@ -181,7 +181,7 @@ describe("User creation tests", () => {
         }
     });
 
-    it("Should not pass with a password that is invalid", async () => {
+    it("Should not register with a password that is invalid", async () => {
         try {
             const response = await signup(
                 "Test 7",
@@ -194,7 +194,7 @@ describe("User creation tests", () => {
         }
     });
 
-    it("Should not pass with a password that has less than eight characters", async () => {
+    it("Should not register with a password that has less than eight characters", async () => {
         try {
             const response = await signup(
                 "Test 8",
@@ -207,7 +207,7 @@ describe("User creation tests", () => {
         }
     });
 
-    it("Should not pass with different passwords", async () => {
+    it("Should not register with different passwords", async () => {
         try {
             const response = await signup(
                 "Test 9",
