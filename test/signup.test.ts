@@ -1,7 +1,7 @@
 // Modules
 import supertest, { Response as SuperTestResponse } from "supertest";
 import app from "../src/instance/app";
-import { development as connection } from "../src/database/connection";
+import connection from "../src/database/connection";
 
 // Instance
 const request = supertest(app);
@@ -21,13 +21,21 @@ const successUser: UserSignup = {
     password: "success8"
 };
 
+const repeatedUser: UserSignup = {
+    name: "Repeated User",
+    email: "repeated@user.com",
+    password: "repeated"
+}
+
 // Requests
+type UserFormData = string | undefined;
+
 const signup = async (
-    name: string,
-    email: string,
-    password: string,
-    confirmEmail: string = email,
-    confirmPassword: string = password
+    name: UserFormData,
+    email: UserFormData,
+    password: UserFormData,
+    confirmEmail: UserFormData = email,
+    confirmPassword: UserFormData = password
 ) => new Promise<SuperTestResponse>(async (resolve: Function, reject: Function) => {
     const user = {
         name,
@@ -46,12 +54,30 @@ const signup = async (
 });
 
 // Jest globals
-afterAll(async () => {
-    const { name } = successUser;
+beforeAll(async () => {
+    const { name, email, password } = repeatedUser;
 
     try {
+        await connection.insert({
+            name,
+            email,
+            password,
+            profile_picture: null,
+            slug: "a"
+        }).into("users");
+    } catch (error) {
+        throw new Error(error as string);
+    }
+});
+
+afterAll(async () => {
+    try {
         await connection.delete()
-            .where({name})
+            .where({name: successUser.name})
+            .table("users");
+
+        await connection.delete()
+            .where({name: repeatedUser.name})
             .table("users");
     } catch (error) {
         throw new Error(error as string);
@@ -60,7 +86,7 @@ afterAll(async () => {
 
 // Tests
 describe("User creation tests", () => {
-    it("Should successfully create the account", async () => {
+    it("Should successfully register the account", async () => {
         const { name, email, password } = successUser;
 
         try {
@@ -70,6 +96,127 @@ describe("User creation tests", () => {
                 password
             );
             expect(response.statusCode).toBe(201);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
+
+    it("Should not pass with a name that is invalid", async () => {
+        try {
+            const response = await signup(
+                "",
+                "test1@gmail.com",
+                "12345678"
+            );
+            expect(response.statusCode).toBe(400);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
+
+    it("Should not pass with a name that matches with not allowed characters", async () => {
+        try {
+            const response = await signup(
+                "Test-2",
+                "test2@gmail.com",
+                "12345678"
+            );
+            expect(response.statusCode).toBe(400);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
+
+    it("Should not pass with a name that has less than three characters", async () => {
+        try {
+            const response = await signup(
+                "Te",
+                "test3@gmail.com",
+                "12345678"
+            );
+            expect(response.statusCode).toBe(400);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
+
+    it("Should not pass with an e-mail that is invalid", async () => {
+        try {
+            const response = await signup(
+                "Test 4",
+                "",
+                "12345678"
+            );
+            expect(response.statusCode).toBe(400);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
+
+    it("Should not pass with different e-mails", async () => {
+        try {
+            const response = await signup(
+                "Test 5",
+                "test5A@gmail.com",
+                "12345678",
+                "test5B@gmail.com"
+            );
+            expect(response.statusCode).toBe(400);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
+
+    it("Should not pass with an already registered account", async () => {
+        const { name, email, password } = repeatedUser;
+        try {
+            const response = await signup(
+                name,
+                email,
+                password
+            );
+            expect(response.statusCode).toBe(400);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
+
+    it("Should not pass with a password that is invalid", async () => {
+        try {
+            const response = await signup(
+                "Test 7",
+                "test7@gmail.com",
+                ""
+            );
+            expect(response.statusCode).toBe(400);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
+
+    it("Should not pass with a password that has less than eight characters", async () => {
+        try {
+            const response = await signup(
+                "Test 8",
+                "test8@gmail.com",
+                "12345"
+            );
+            expect(response.statusCode).toBe(400);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
+
+    it("Should not pass with different passwords", async () => {
+        try {
+            const response = await signup(
+                "Test 9",
+                "test9@gmail.com",
+                "A-12345678",
+                undefined,
+                "B-12345678"
+            );
+            expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
         }
