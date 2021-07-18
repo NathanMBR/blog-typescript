@@ -1,12 +1,12 @@
 // Modules
-import { Knex } from "knex";
+import connection from "./connection";
 import { usersLengths, categoriesLengths, articlesLengths } from "../settings/lengths";
 const { name, email, password, profilePicture } = usersLengths;
 const { category } = categoriesLengths;
 const { title, description } = articlesLengths;
 
 // Tables creation
-const runMigrations = async (connection: Knex<any, Array<unknown>>) => {
+const runMigrations = async () => new Promise(async (resolve: Function, reject: Function) => {
     try {
         await connection.transaction(async transaction => {
             await transaction.raw(
@@ -59,10 +59,10 @@ const runMigrations = async (connection: Knex<any, Array<unknown>>) => {
                 `);`
             );
         });
-        console.log("Tables successfully created!");
+        resolve("Tables successfully created!");
     } catch (error) {
-        console.error(error);
+        reject(error);
     }
-};
+});
 
 export default runMigrations;
