@@ -1,6 +1,6 @@
 // Modules
 import dotenv from "dotenv";
-import knex, { Knex } from "knex";
+import knex from "knex";
 
 // Environment variables
 dotenv.config();
@@ -15,12 +15,12 @@ const {
     PG_USER_DEV,
     PG_PASSWORD_DEV,
     PG_DB_DEV,
-    IS_APP_IN_PRODUCTION
+    APP_MODE
 } = process.env;
 
 // Connections
-const connections = [
-    knex({
+const connections = {
+    production: knex({
         client: "pg",
         connection: {
             host: PG_HOST,
@@ -31,7 +31,7 @@ const connections = [
         }
     }),
 
-    knex({
+    development: knex({
         client: "pg",
         connection: {
             host: PG_HOST_DEV,
@@ -41,11 +41,13 @@ const connections = [
             database: PG_DB_DEV
         }
     })
-]
+}
 
 // Setting the connection
-let connection: Knex<any, Array<unknown>>;
-connection = connections[IS_APP_IN_PRODUCTION == "true" ? 0 : 1];
+if (!(APP_MODE === "production" || APP_MODE === "development"))
+    throw new Error("Invalid value for APP_MODE environment variable");
+
+const connection = connections[APP_MODE];
 
 // Export
 export default connection;
