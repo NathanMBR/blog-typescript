@@ -1,11 +1,11 @@
 // Modules
 import express, { Request, Response } from "express";
 const router = express.Router();
-import { production as connection } from "../../database/connection";
-import { hashSync, genSaltSync } from "bcryptjs";
+import connection from "../../database/connection";
+import { hash, genSalt } from "bcryptjs";
 import slugify from "slugify";
 
-// Settings and Types
+// Connection configuration, settings and types
 import { usersLengths } from "../../settings/lengths";
 import { UsersTable } from "../../database/tablesTypes";
 
@@ -90,22 +90,25 @@ router.post("/signup", async (req: Request, res: Response) => {
             errors.push("The e-mail is already in use.");
 
         if (errors.length === 0) {
+            const salt = await genSalt(12);
+            const passwordHash = await hash(password, salt);
+
             const user: UsersTable = {
                 name,
                 email,
-                password: hashSync(password, genSaltSync(usersLengths.password.max)),
+                password: passwordHash,
                 profile_picture: null,
                 slug: slugify(name, {lower: true})
             }
 
             await connection.insert(user)
                 .into("users");
-            
+        
             res.sendStatus(201);
         } else
             res.status(400).json({errors});
-    } catch (error: any) {
-        console.error(error);
+    } catch (error) {
+        console.error(error as string);
         res.sendStatus(500);
     }
 });
