@@ -7,12 +7,14 @@ import connection from "../src/database/connection";
 const request = supertest(app);
 
 // Test users
+type UserSignupFormData = string | undefined;
+
 interface UserSignup {
-    name: string;
-    email: string;
-    password: string;
-    confirmEmail?: string;
-    confirmPassword?: string;
+    name: UserSignupFormData;
+    email: UserSignupFormData;
+    password: UserSignupFormData;
+    confirmEmail?: UserSignupFormData;
+    confirmPassword?: UserSignupFormData;
 }
 
 const successUser: UserSignup = {
@@ -28,14 +30,12 @@ const repeatedUser: UserSignup = {
 }
 
 // Requests
-type UserFormData = string | undefined;
-
 const signup = async (
-    name: UserFormData,
-    email: UserFormData,
-    password: UserFormData,
-    confirmEmail: UserFormData = email,
-    confirmPassword: UserFormData = password
+    name: UserSignupFormData,
+    email: UserSignupFormData,
+    password: UserSignupFormData,
+    confirmEmail: UserSignupFormData = email,
+    confirmPassword: UserSignupFormData = password
 ) => new Promise<SuperTestResponse>(async (resolve: Function, reject: Function) => {
     const user: UserSignup = {
         name,
