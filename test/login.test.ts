@@ -2,6 +2,7 @@
 import supertest, { Response as SuperTestResponse } from "supertest";
 import app from "../src/instance/app";
 import connection from "../src/database/connection";
+import { genSalt, hash } from "bcryptjs";
 
 // Instance
 const request = supertest(app);
@@ -40,12 +41,14 @@ const login = async (
 // Jest globals
 beforeAll(async () => {
     const { email, password } = successUser;
-
+    
     try {
+        const salt = await genSalt(12);
+        const hashedPassword = await hash(password as string, salt);
         await connection.insert({
             name: "b",
             email,
-            password,
+            password: hashedPassword,
             profile_picture: null,
             slug: "b"
         }).into("users");
@@ -158,7 +161,7 @@ describe("User authentication tests", () => {
                 "incorrectPassword"
             );
 
-            expect(incorrectEmail.body.error).toBe(incorrectPassword.body.error);
+            expect(incorrectEmail.body.errors[0]).toBe(incorrectPassword.body.errors[0]);
         } catch (error) {
             throw new Error(error as string);
         }
