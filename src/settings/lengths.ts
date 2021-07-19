@@ -12,12 +12,12 @@ const usersLengths = {
 
     password: {
         min: 8,
-        max: 255
+        max: 512
     },
     
     profilePicture: {
         min: 1,
-        max: 255
+        max: 512
     }
 }
 

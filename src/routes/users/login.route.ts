@@ -8,6 +8,7 @@ import { sign } from "jsonwebtoken";
 // Settings
 import { usersLengths } from "../../settings/lengths";
 import secret from "../../settings/secret";
+import tokenExpiration from "../../settings/tokenExpiration";
 
 // Routes
 router.post("/login", async (req: Request, res: Response) => {
@@ -58,7 +59,7 @@ router.post("/login", async (req: Request, res: Response) => {
         // Error checking
         if (errors.length === 0) {
             // User authentication
-            sign({email}, secret, (error: Error | null, token: string | undefined) => {
+            sign({email}, secret, {expiresIn: tokenExpiration, algorithm: "HS512"}, (error: Error | null, token: string | undefined) => {
                 if (error)
                     throw new Error(error as unknown as string); // Damn JS, was It hard to accept "any" and convert into a string?
                 else
