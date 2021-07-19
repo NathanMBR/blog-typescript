@@ -1,6 +1,6 @@
 // Modules
-import express, { Request, Response } from "express";
-const router = express.Router();
+import { Router, Request, Response } from "express";
+const router = Router();
 import connection from "../../database/connection";
 import { hash, genSalt } from "bcryptjs";
 import slugify from "slugify";
@@ -89,7 +89,9 @@ router.post("/signup", async (req: Request, res: Response) => {
         if (repeatedEmail[0])
             errors.push("The e-mail is already in use.");
 
+        // Error checking
         if (errors.length === 0) {
+            // User registration
             const salt = await genSalt(12);
             const passwordHash = await hash(password, salt);
 

@@ -1,6 +1,6 @@
 // Modules
-import express, { Request, Response } from "express";
-const router = express.Router();
+import { Router, Request, Response } from "express";
+const router = Router();
 
 // Routes
 import { router as homeRouter } from "./home/home.route";
@@ -8,6 +8,9 @@ router.use("/", homeRouter);
 
 import { router as signupRouter } from "./users/signup.route";
 router.use("/", signupRouter);
+
+import { router as loginRouter } from "./users/login.route";
+router.use("/", loginRouter);
 
 router.all("/*", (_req: Request, res: Response) => {
     res.sendStatus(404);
