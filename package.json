@@ -7,7 +7,7 @@
   "author": "Nathan Murillo <nathanmurillodeoliveira@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "test": "jest",
     "dev": "ts-node-dev ./src/index.ts",
     "migrate": "ts-node ./src/scripts/runMigrations.ts",

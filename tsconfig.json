@@ -1,6 +1,7 @@
+// This config is used for error-picking during coding.
 {
-  "include": ["src"],
-  "exclude": ["node_modules"],
+  "include": ["./src", "./test", "./jest.config.ts"],
+  "exclude": ["./node_modules"],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
 
