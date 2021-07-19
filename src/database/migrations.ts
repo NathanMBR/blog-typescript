@@ -31,6 +31,7 @@ const runMigrations = async () => new Promise(async (resolve: Function, reject: 
                     `id SERIAL NOT NULL, ` +
                     `category VARCHAR(${category.max}) NOT NULL, ` +
                     `author_id INTEGER NOT NULL, ` +
+                    `slug VARCHAR(${category.max}) NOT NULL, ` +
                     `created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), ` +
                     `is_deleted BOOLEAN NOT NULL DEFAULT false, ` +
                     `PRIMARY KEY (id)` +
