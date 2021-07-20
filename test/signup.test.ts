@@ -72,12 +72,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
     try {
-        await connection.delete()
-            .where({name: successUser.name})
-            .table("users");
-
-        await connection.delete()
-            .where({name: repeatedUser.name})
+        await connection.truncate()
             .table("users");
     } catch (error) {
         throw new Error(error as string);

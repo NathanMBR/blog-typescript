@@ -58,11 +58,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    const { email } = successUser;
-
     try {
-        await connection.delete()
-            .where({email})
+        await connection.truncate()
             .table("users");
     } catch (error) {
         throw new Error(error as string);
