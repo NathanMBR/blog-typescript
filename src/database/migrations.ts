@@ -9,6 +9,8 @@ const { title, description } = articlesLengths;
 const runMigrations = async () => new Promise(async (resolve: Function, reject: Function) => {
     try {
         await connection.transaction(async transaction => {
+            await transaction.raw("DROP TABLE IF EXISTS users, categories, articles, commentaries;");
+
             await transaction.raw(
                 `CREATE TABLE IF NOT EXISTS users(` +
                     `id SERIAL NOT NULL, ` +
