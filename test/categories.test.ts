@@ -26,6 +26,14 @@ const newCategory: Category = {
     category: "New Category"
 }
 
+const deleteCategory1: Category = {
+    category: "Delete Category By ID"
+}
+
+const deleteCategory2: Category = {
+    category: "Delete Category By Slug"
+}
+
 // Requests
 const getCategoriesByPage = async (
     page: CategoryFormData | number = 1
@@ -71,7 +79,7 @@ const editCategoryByIdOrSlug = async (
         reject(error as string);
     }
 });
-/*
+
 const deleteCategoryByIdOrSlug = async(
     categoryIdentifier: CategoryFormData | number
 ) => new Promise<SuperTestResponse>(async (resolve: Function, reject: Function) => {
@@ -82,7 +90,7 @@ const deleteCategoryByIdOrSlug = async(
         reject(error as string);
     }
 });
-*/
+
 // Jest globals
 beforeAll(async () => {
     try {
@@ -96,6 +104,18 @@ beforeAll(async () => {
             category: repeatedCategory.category,
             author_id: 0,
             slug: slugify(repeatedCategory.category as string, {lower: true})
+        }).into("categories");
+
+        await connection.insert({
+            category: deleteCategory1.category,
+            author_id: 0,
+            slug: slugify(deleteCategory1.category as string, {lower: true})
+        }).into("categories");
+
+        await connection.insert({
+            category: deleteCategory2.category,
+            author_id: 0,
+            slug: slugify(deleteCategory2.category as string, {lower: true})
         }).into("categories");
     } catch (error) {
         throw new Error(error as string);
@@ -353,5 +373,58 @@ describe("Category PATCH tests", () => {
 });
 
 describe("Category DELETE tests", () => {
+    it("Should successfully delete a category by ID and return the 200 status code", async () => {
+        try {
+            const select = await connection.select()
+                .where({category: deleteCategory1.category})
+                .table("categories");
+            const { id } = select[0];
 
+            const response = await deleteCategoryByIdOrSlug(id);
+            expect(response.statusCode).toBe(200);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
+
+    it("Should successfully delete a category by slug and return the 200 status code", async () => {
+        try {
+            const select = await connection.select()
+                .where({category: deleteCategory2.category})
+                .table("categories");
+            const { slug } = select[0];
+
+            const response = await deleteCategoryByIdOrSlug(slug);
+            expect(response.statusCode).toBe(200);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
+
+    it("Should not delete when receiving an invalid ID", async () => {
+        try {
+            const response = await deleteCategoryByIdOrSlug(-7);
+            expect(response.statusCode).toBe(400);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
+
+    it("Should not delete when receiving an invalid slug", async () => {
+        try {
+            const response = await deleteCategoryByIdOrSlug(undefined);
+            expect(response.statusCode).toBe(400);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
+
+    it("Should not delete an category that doesn't exists", async () => {
+        try {
+            const response = await deleteCategoryByIdOrSlug("does not exist");
+            expect(response.statusCode).toBe(400);
+        } catch (error) {
+            throw new Error(error as string);
+        }
+    });
 });
