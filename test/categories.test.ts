@@ -3,6 +3,8 @@ import supertest, { Response as SuperTestResponse } from "supertest";
 import app from "../src/instance/app";
 import connection from "../src/database/connection";
 import slugify from "slugify";
+import { sign } from "jsonwebtoken";
+import secret from "../src/settings/secret";
 
 // Instance
 const request = supertest(app);
@@ -35,6 +37,8 @@ const deleteCategory2: Category = {
 }
 
 // Requests
+let jwtToken: string = "Bearer ";
+
 const getCategoriesByPage = async (
     page: CategoryFormData | number = 1
 ) => new Promise<SuperTestResponse>(async (resolve: Function, reject: Function) => {
@@ -61,7 +65,9 @@ const createCategory = async (
     category: CategoryFormData
 ) => new Promise<SuperTestResponse>(async (resolve: Function, reject: Function) => {
     try {
-        const response = await request.post("/categories").send(category);
+        const response = await request.post("/categories")
+            .send({category})
+            .set("authorization", jwtToken);
         resolve(response);
     } catch (error) {
         reject(error as string);
@@ -73,7 +79,10 @@ const editCategoryByIdOrSlug = async (
     newCategoryName: CategoryFormData
 ) => new Promise<SuperTestResponse>(async (resolve: Function, reject: Function) => {
     try {
-        const response = await request.patch(`/categories/${categoryIdentifier}`).send(newCategoryName);
+        const response = await request.patch(`/categories/${categoryIdentifier}`)
+            .send({category: newCategoryName})
+            .set("authorization", jwtToken);
+            
         resolve(response);
     } catch (error) {
         reject(error as string);
@@ -84,7 +93,9 @@ const deleteCategoryByIdOrSlug = async(
     categoryIdentifier: CategoryFormData | number
 ) => new Promise<SuperTestResponse>(async (resolve: Function, reject: Function) => {
     try {
-        const response = await request.delete(`/categories/${categoryIdentifier}`);
+        const response = await request.delete(`/categories/${categoryIdentifier}`)   
+            .set("authorization", jwtToken);
+
         resolve(response);
     } catch (error) {
         reject(error as string);
@@ -92,34 +103,42 @@ const deleteCategoryByIdOrSlug = async(
 });
 
 // Jest globals
-beforeAll(async () => {
-    try {
-        await connection.insert({
-            category: successCategory.category,
-            author_id: 0,
-            slug: slugify(successCategory.category as string, {lower: true})
-        }).into("categories");
+beforeAll(() => {
+    sign({id: 0, email: "test_user@test.api.com", is_admin: true}, secret, {expiresIn: "10 minutes", algorithm: "HS512"}, async (error: Error | null, token: string | undefined) => {
+        if (error)
+            throw new Error(error as unknown as string);
+        else {
+            jwtToken += token as string;
 
-        await connection.insert({
-            category: repeatedCategory.category,
-            author_id: 0,
-            slug: slugify(repeatedCategory.category as string, {lower: true})
-        }).into("categories");
+            try {
+                await connection.insert({
+                    category: successCategory.category,
+                    author_id: 0,
+                    slug: slugify(successCategory.category as string, {lower: true})
+                }).into("categories");
 
-        await connection.insert({
-            category: deleteCategory1.category,
-            author_id: 0,
-            slug: slugify(deleteCategory1.category as string, {lower: true})
-        }).into("categories");
+                await connection.insert({
+                    category: repeatedCategory.category,
+                    author_id: 0,
+                    slug: slugify(repeatedCategory.category as string, {lower: true})
+                }).into("categories");
 
-        await connection.insert({
-            category: deleteCategory2.category,
-            author_id: 0,
-            slug: slugify(deleteCategory2.category as string, {lower: true})
-        }).into("categories");
-    } catch (error) {
-        throw new Error(error as string);
-    }
+                await connection.insert({
+                    category: deleteCategory1.category,
+                    author_id: 0,
+                    slug: slugify(deleteCategory1.category as string, {lower: true})
+                }).into("categories");
+
+                await connection.insert({
+                    category: deleteCategory2.category,
+                    author_id: 0,
+                    slug: slugify(deleteCategory2.category as string, {lower: true})
+                }).into("categories");
+            } catch (error) {
+                throw new Error(error as string);
+            }
+        }
+    });
 });
 
 afterAll(async () => {
@@ -180,18 +199,7 @@ describe("Category GET tests", () => {
         }
     });
 
-    it("Should return the first page JSON when receiving an undefined value", async () => {
-        try {
-            const baseResponse = stringify(await getCategoriesByPage(1));
-            const response = stringify(await getCategoriesByPage(undefined));
-
-            expect(response).toBe(baseResponse);
-        } catch (error) {
-            throw new Error(error as string);
-        }
-    });
-
-    // Getting data by slug
+    // Getting data by identifier
     it("Should successfully return an data array with only one object", async () => {
         try {
             const response = await getCategoryByIdOrSlug(1);
@@ -245,8 +253,7 @@ describe("Category GET tests", () => {
 
     it("Should return an error array when receiving an invalid parameter", async () => {
         try {
-            const response = await getCategoryByIdOrSlug(undefined);
-
+            const response = await getCategoryByIdOrSlug(-123);
             expect(Array.isArray(response.body.errors)).toBe(true);
         } catch (error) {
             throw new Error(error as string);
@@ -304,7 +311,7 @@ describe("Category PATCH tests", () => {
                 .where({category})
                 .table("categories");
             const { id } = select[0];
-
+            
             const response = await editCategoryByIdOrSlug(id as number, "New Category 2");
             expect(response.statusCode).toBe(200);
         } catch (error) {
@@ -324,15 +331,6 @@ describe("Category PATCH tests", () => {
     it("Should not edit a category with an invalid ID", async () => {
         try {
             const response = await editCategoryByIdOrSlug(-1, "Foo");
-            expect(response.statusCode).toBe(400);
-        } catch (error) {
-            throw new Error(error as string);
-        }
-    });
-
-    it("Should not edit a category with a invalid slug", async () => {
-        try {
-            const response = await editCategoryByIdOrSlug(undefined, "Foo");
             expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
@@ -401,15 +399,6 @@ describe("Category DELETE tests", () => {
     it("Should not delete when receiving an invalid ID", async () => {
         try {
             const response = await deleteCategoryByIdOrSlug(-7);
-            expect(response.statusCode).toBe(400);
-        } catch (error) {
-            throw new Error(error as string);
-        }
-    });
-
-    it("Should not delete when receiving an invalid slug", async () => {
-        try {
-            const response = await deleteCategoryByIdOrSlug(undefined);
             expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
