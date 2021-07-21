@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "test": "jest",
+    "test": "jest --verbose",
     "dev": "ts-node-dev ./src/index.ts",
     "migrate": "ts-node ./src/scripts/runMigrations.ts",
     "start": "node ./build/index.js"
