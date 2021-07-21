@@ -58,8 +58,10 @@ router.post("/login", async (req: Request, res: Response) => {
 
         // Error checking
         if (errors.length === 0) {
+            const { id, is_admin } = doesEmailExist;
+
             // User authentication
-            sign({email}, secret, {expiresIn: tokenExpiration, algorithm: "HS512"}, (error: Error | null, token: string | undefined) => {
+            sign({id, email, is_admin}, secret, {expiresIn: tokenExpiration, algorithm: "HS512"}, (error: Error | null, token: string | undefined) => {
                 if (error)
                     throw new Error(error as unknown as string); // Damn JS, was It hard to accept "any" and convert into a string?
                 else
