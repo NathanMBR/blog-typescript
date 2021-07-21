@@ -1,6 +1,6 @@
 // Modules
-import express, { Request, Response } from "express";
-const router = express.Router();
+import { Router, Request, Response } from "express";
+const router = Router();
 
 // Routes
 router.get("/", (_req: Request, res: Response) => {

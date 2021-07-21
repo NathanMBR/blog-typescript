@@ -12,6 +12,9 @@ router.use("/", signupRouter);
 import { router as loginRouter } from "./users/login.route";
 router.use("/", loginRouter);
 
+import { router as categoriesRouter } from "./categories/categories.route";
+router.use("/", categoriesRouter);
+
 router.all("/*", (_req: Request, res: Response) => {
     res.sendStatus(404);
 });
