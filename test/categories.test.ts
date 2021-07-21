@@ -247,10 +247,7 @@ describe("Category GET tests", () => {
         try {
             const response = await getCategoryByIdOrSlug(undefined);
 
-            if (response.body.data)
-                expect(Array.isArray(response.body.data.errors)).toBe(true);
-            else
-                expect(response.body.data).not.toBeUndefined();
+            expect(Array.isArray(response.body.errors)).toBe(true);
         } catch (error) {
             throw new Error(error as string);
         }
