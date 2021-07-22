@@ -107,36 +107,35 @@ beforeAll(() => {
     sign({id: 0, email: "test_user@test.api.com", is_admin: true}, secret, {expiresIn: "10 minutes", algorithm: "HS512"}, async (error: Error | null, token: string | undefined) => {
         if (error)
             throw new Error(error as unknown as string);
-        else {
+        else
             jwtToken += token as string;
 
-            try {
-                await connection.insert({
-                    category: successCategory.category,
-                    author_id: 0,
-                    slug: slugify(successCategory.category as string, {lower: true})
-                }).into("categories");
+        try {
+            await connection.insert({
+                category: successCategory.category,
+                author_id: 0,
+                slug: slugify(successCategory.category as string, {lower: true})
+            }).into("categories");
 
-                await connection.insert({
-                    category: repeatedCategory.category,
-                    author_id: 0,
-                    slug: slugify(repeatedCategory.category as string, {lower: true})
-                }).into("categories");
+            await connection.insert({
+                category: repeatedCategory.category,
+                author_id: 0,
+                slug: slugify(repeatedCategory.category as string, {lower: true})
+            }).into("categories");
 
-                await connection.insert({
-                    category: deleteCategory1.category,
-                    author_id: 0,
-                    slug: slugify(deleteCategory1.category as string, {lower: true})
-                }).into("categories");
+            await connection.insert({
+                category: deleteCategory1.category,
+                author_id: 0,
+                slug: slugify(deleteCategory1.category as string, {lower: true})
+            }).into("categories");
 
-                await connection.insert({
-                    category: deleteCategory2.category,
-                    author_id: 0,
-                    slug: slugify(deleteCategory2.category as string, {lower: true})
-                }).into("categories");
-            } catch (error) {
-                throw new Error(error as string);
-            }
+            await connection.insert({
+                category: deleteCategory2.category,
+                author_id: 0,
+                slug: slugify(deleteCategory2.category as string, {lower: true})
+            }).into("categories");
+        } catch (error) {
+            throw new Error(error as string);
         }
     });
 });
@@ -151,7 +150,7 @@ afterAll(async () => {
 });
 
 // Tests
-describe("Category GET tests", () => {
+describe("Categories GET tests", () => {
     const stringify = (response: SuperTestResponse): string => JSON.stringify(response.body.data);
 
     // Getting data by pages
@@ -261,7 +260,7 @@ describe("Category GET tests", () => {
     });
 });
 
-describe("Category POST tests", () => {
+describe("Categories POST tests", () => {
     it("Should successfully create a category and return the 201 status code", async () => {
         const { category } = newCategory;
 
@@ -302,7 +301,7 @@ describe("Category POST tests", () => {
     });
 });
 
-describe("Category PATCH tests", () => {
+describe("Categories PATCH tests", () => {
     it("Should successfully edit a category by ID and return the 200 status code", async () => {
         const { category } = repeatedCategory; 
 
@@ -367,7 +366,7 @@ describe("Category PATCH tests", () => {
     });
 });
 
-describe("Category DELETE tests", () => {
+describe("Categories DELETE tests", () => {
     it("Should successfully delete a category by ID and return the 200 status code", async () => {
         try {
             const select = await connection.select()
