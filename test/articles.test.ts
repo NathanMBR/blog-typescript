@@ -64,7 +64,7 @@ const deleteArticle2: Article = {
 let jwtToken: string = "Bearer ";
 
 const getArticlesByPage = async (
-    page: ArticleFormData
+    page?: ArticleFormData
 ) => new Promise<SuperTestResponse>(async (resolve: Function, reject: Function) => {
     try {
         const response = await request.get(`/articles?page=${page}`);
@@ -218,112 +218,229 @@ describe("Articles GET tests", () => {
 
     // Getting data by pages
     it("Should successfully return an data array with 10 or less objects", async () => {
-
+        try {
+            const response = await getArticlesByPage();
+            if (response.body.data)
+                expect(response.body.data.length).toBeLessThanOrEqual(10);
+            else
+                expect(response.body.data).not.toBeUndefined();
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should return the 200 status code (pagination)", async () => {
-
+        try {
+            const response = await getArticlesByPage();
+            expect(response.statusCode).toBe(200);
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
-    it("Should return the first page JSON when receiving a number lesses than 1", async () => {
+    it("Should return the first page JSON when receiving a number lesser than 1", async () => {
+        try {
+            const baseResponse = stringify(await getArticlesByPage(1));
+            const response = stringify(await getArticlesByPage(-2));
 
+            expect(response).toBe(baseResponse);
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should return the first page JSON when receiving a non-convertible string", async () => {
-
+        try {
+            const baseResponse = stringify(await getArticlesByPage(1));
+            const response = stringify(await getArticlesByPage("ABC"));
+            expect(response).toBe(baseResponse);
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     // Getting data by identifier
     it("Should successfully return an data array with only one object", async () => {
-
+        try {
+            const response = await getArticleByIdOrSlug(1);
+            if (response.body.data)
+                expect(response.body.data.length).toBe(1);
+            else
+                expect(response.body.data).not.toBeUndefined();
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should successfully return data when receiving an ID", async () => {
-
+        try {
+            const response = await getArticleByIdOrSlug(1);
+            expect(Array.isArray(response.body.data)).toBe(true);
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should successfully return data when receiving a slug", async () => {
+        const { title } = successArticle;
 
+        try {
+            const response = await getArticleByIdOrSlug(slugify(title as string, {lower: true}));
+            expect(Array.isArray(response.body.data)).toBe(true);
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should return the 200 status code (search by ID/slug)", async () => {
-
+        try {
+            const response = await getArticleByIdOrSlug(1);
+            expect(response.statusCode).toBe(200);
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should return an error array when receiving an invalid parameter", async () => {
-
+        try {
+            const response = await getArticleByIdOrSlug(-1);
+            expect(Array.isArray(response.body.errors)).toBe(true);
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 });
 
 describe("Articles POST tests", () => {
     it("Should successfully create an article and return the 201 status code", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should not create an article with invalid parameters", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should not create an article with parameters that has more characters than allowed", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should not create an article that is already created", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 });
 
 describe("Articles PATCH tests", () => {
     it("Should successfully edit an article by ID and return the 200 status code", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should successfully edit an article by slug and return the 200 status code", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should not edit an article with an invalid ID", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should not edit an article with an invalid slug", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should not edit an article with invalid parameters", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should not edit an article with parameters that has more characters than allowed", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should not edit an article slug to some other that already exists", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 });
 
 describe("Articles DELETE tests", () => {
     it("Should successfully delete an article by ID and return the 200 status code", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should successfully delete an article by slug and return the 200 status code", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should not delete an article with an invalid ID", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should not delete an article with an invalid slug", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 
     it("Should not delete an article that doesn't exists", async () => {
-
+        try {
+            
+        } catch (error) {
+            throw new Error(error as string);
+        }
     });
 });
-
-// TO-DO
-// Tests for each HTTP Method
