@@ -214,19 +214,115 @@ afterAll(async () => {
 
 // Tests
 describe("Articles GET tests", () => {
+    const stringify = (response: SuperTestResponse): string => JSON.stringify(response.body.data);
 
+    // Getting data by pages
+    it("Should successfully return an data array with 10 or less objects", async () => {
+
+    });
+
+    it("Should return the 200 status code (pagination)", async () => {
+
+    });
+
+    it("Should return the first page JSON when receiving a number lesses than 1", async () => {
+
+    });
+
+    it("Should return the first page JSON when receiving a non-convertible string", async () => {
+
+    });
+
+    // Getting data by identifier
+    it("Should successfully return an data array with only one object", async () => {
+
+    });
+
+    it("Should successfully return data when receiving an ID", async () => {
+
+    });
+
+    it("Should successfully return data when receiving a slug", async () => {
+
+    });
+
+    it("Should return the 200 status code (search by ID/slug)", async () => {
+
+    });
+
+    it("Should return an error array when receiving an invalid parameter", async () => {
+
+    });
 });
 
 describe("Articles POST tests", () => {
+    it("Should successfully create an article and return the 201 status code", async () => {
 
+    });
+
+    it("Should not create an article with invalid parameters", async () => {
+
+    });
+
+    it("Should not create an article with parameters that has more characters than allowed", async () => {
+
+    });
+
+    it("Should not create an article that is already created", async () => {
+
+    });
 });
 
 describe("Articles PATCH tests", () => {
+    it("Should successfully edit an article by ID and return the 200 status code", async () => {
 
+    });
+
+    it("Should successfully edit an article by slug and return the 200 status code", async () => {
+
+    });
+
+    it("Should not edit an article with an invalid ID", async () => {
+
+    });
+
+    it("Should not edit an article with an invalid slug", async () => {
+
+    });
+
+    it("Should not edit an article with invalid parameters", async () => {
+
+    });
+
+    it("Should not edit an article with parameters that has more characters than allowed", async () => {
+
+    });
+
+    it("Should not edit an article slug to some other that already exists", async () => {
+
+    });
 });
 
 describe("Articles DELETE tests", () => {
+    it("Should successfully delete an article by ID and return the 200 status code", async () => {
 
+    });
+
+    it("Should successfully delete an article by slug and return the 200 status code", async () => {
+
+    });
+
+    it("Should not delete an article with an invalid ID", async () => {
+
+    });
+
+    it("Should not delete an article with an invalid slug", async () => {
+
+    });
+
+    it("Should not delete an article that doesn't exists", async () => {
+
+    });
 });
 
 // TO-DO

@@ -228,7 +228,7 @@ describe("Categories GET tests", () => {
         }
     });
 
-    it("Should successfully return data when receiving an slug", async () => {
+    it("Should successfully return data when receiving a slug", async () => {
         const { category } = successCategory;
 
         try {
