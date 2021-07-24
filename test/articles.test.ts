@@ -44,6 +44,22 @@ const repeatedArticle: Article = {
     author_id: 1
 };
 
+const editArticle1: Article = {
+    title: "Edit Article 1",
+    description: "This article is edit 1.",
+    article: "Lorem Ipsum...",
+    category_id: 1,
+    author_id: 1
+};
+
+const editArticle2: Article = {
+    title: "Edit Article 2",
+    description: "This article is edit 2.",
+    article: "Lorem Ipsum...",
+    category_id: 1,
+    author_id: 1
+};
+
 const deleteArticle1: Article = {
     title: "Delete Article 1",
     description: "This article is delete 1.",
@@ -89,8 +105,7 @@ const createArticle = async (
     title: ArticleFormData,
     description: ArticleFormData,
     article: ArticleFormData,
-    category_id: ArticleFormData,
-    author_id: ArticleFormData
+    category_id: ArticleFormData
 ) => new Promise<SuperTestResponse>(async (resolve: Function, reject: Function) => {
     try {
         const response = await request.post("/articles")
@@ -98,8 +113,7 @@ const createArticle = async (
                 title,
                 description,
                 article,
-                category_id,
-                author_id
+                category_id
             })
             .set("authorization", jwtToken);
         resolve(response);
@@ -113,8 +127,7 @@ const editArticleByIdOrSlug = async (
     title: ArticleFormData,
     description: ArticleFormData,
     article: ArticleFormData,
-    category_id: ArticleFormData,
-    author_id: ArticleFormData
+    category_id: ArticleFormData
 ) => new Promise<SuperTestResponse>(async (resolve: Function, reject: Function) => {
     try {
         const response = await request.patch(`/articles/${identifier}`)
@@ -122,8 +135,7 @@ const editArticleByIdOrSlug = async (
                 title,
                 description,
                 article,
-                category_id,
-                author_id
+                category_id
             })
             .set("authorization", jwtToken);
         resolve(response);
@@ -155,6 +167,14 @@ beforeAll(async () => {
         try {
             await connection
                 .insert({
+                    category: "Test Category",
+                    author_id: 0,
+                    slug: slugify("Test Category", {lower: true})
+                })
+                .into("categories");
+
+            await connection
+                .insert({
                     title: successArticle.title,
                     description: successArticle.description,
                     article: successArticle.article,
@@ -175,6 +195,28 @@ beforeAll(async () => {
                 })
                 .into("articles");
 
+            await connection
+                .insert({
+                    title: editArticle1.title,
+                    description: editArticle1.description,
+                    article: editArticle1.article,
+                    category_id: editArticle1.category_id,
+                    author_id: editArticle1.author_id,
+                    slug: slugify(editArticle1.title as string, {lower: true})
+                })
+                .into("articles");
+
+            await connection
+                .insert({
+                    title: editArticle2.title,
+                    description: editArticle2.description,
+                    article: editArticle2.article,
+                    category_id: editArticle2.category_id,
+                    author_id: editArticle2.author_id,
+                    slug: slugify(editArticle2.title as string, {lower: true})
+                })
+                .into("articles");
+            
             await connection
                 .insert({
                     title: deleteArticle1.title,
@@ -204,6 +246,10 @@ beforeAll(async () => {
 
 afterAll(async () => {
     try {
+        await connection
+            .truncate()
+            .table("categories");
+
         await connection
             .truncate()
             .table("articles");
@@ -313,8 +359,22 @@ describe("Articles GET tests", () => {
 
 describe("Articles POST tests", () => {
     it("Should successfully create an article and return the 201 status code", async () => {
+        const { title, description, article } = newArticle;
+
         try {
-            
+            const selectCategory = await connection.select()
+                .where({category: "Test Category"})
+                .table("categories");
+            const category_id = selectCategory[0].id;
+
+            const response = await createArticle(
+                title,
+                description,
+                article,
+                category_id
+            );
+
+            expect(response.statusCode).toBe(201);
         } catch (error) {
             throw new Error(error as string);
         }
@@ -322,7 +382,13 @@ describe("Articles POST tests", () => {
 
     it("Should not create an article with invalid parameters", async () => {
         try {
-            
+            const response = await createArticle(
+                undefined,
+                undefined,
+                undefined,
+                undefined
+            );
+            expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
         }
@@ -330,15 +396,28 @@ describe("Articles POST tests", () => {
 
     it("Should not create an article with parameters that has more characters than allowed", async () => {
         try {
-            
+            const response = await createArticle(
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+                "article theoretically has unlimited characters, so don't need to test",
+                1
+            );
+            expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
         }
     });
 
     it("Should not create an article that is already created", async () => {
+        const { title, description, article, category_id } = repeatedArticle;
         try {
-            
+            const response = await createArticle(
+                title,
+                description,
+                article,
+                category_id
+            )
+            expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
         }
@@ -347,16 +426,52 @@ describe("Articles POST tests", () => {
 
 describe("Articles PATCH tests", () => {
     it("Should successfully edit an article by ID and return the 200 status code", async () => {
+        const { title } = editArticle1;
+        
         try {
-            
+            const selectArticle = await connection.select()
+                .where({title})
+                .table("articles");
+            const article_id = selectArticle[0].id;
+
+            const selectCategory = await connection.select()
+                .where({category: "Test Category"})
+                .table("categories");
+            const category_id = selectCategory[0].id;
+
+            const response = await editArticleByIdOrSlug(
+                article_id,
+                "Edited Article 1",
+                "This article is edited 1.",
+                "Lorem Ipsum...",
+                category_id
+            );
+            expect(response.statusCode).toBe(200);
         } catch (error) {
             throw new Error(error as string);
         }
     });
 
     it("Should successfully edit an article by slug and return the 200 status code", async () => {
+        const { title } = editArticle2;
+
         try {
             
+            const article_slug = slugify(title as string, {lower: true});
+
+            const selectCategory = await connection.select()
+                .where({category: "Test Category"})
+                .table("categories");
+            const category_id = selectCategory[0].id;
+
+            const response = await editArticleByIdOrSlug(
+                article_slug,
+                "Edited Article 2",
+                "This article is edited 2.",
+                "Lorem Ipsum...",
+                category_id
+            );
+            expect(response.statusCode).toBe(200);
         } catch (error) {
             throw new Error(error as string);
         }
@@ -364,7 +479,14 @@ describe("Articles PATCH tests", () => {
 
     it("Should not edit an article with an invalid ID", async () => {
         try {
-            
+            const response = await editArticleByIdOrSlug(
+                -1,
+                "Invalid ID",
+                "This ID is invalid.",
+                "Lorem Ipsum...",
+                1
+            );
+            expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
         }
@@ -372,31 +494,81 @@ describe("Articles PATCH tests", () => {
 
     it("Should not edit an article with an invalid slug", async () => {
         try {
-            
+            const response = await editArticleByIdOrSlug(
+                undefined,
+                "Invalid slug",
+                "This slug is invalid.",
+                "Lorem Ipsum...",
+                1
+            );
+            expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
         }
     });
 
     it("Should not edit an article with invalid parameters", async () => {
+        const { title } = editArticle1;
+
         try {
-            
+            const selectArticle = await connection.select()
+                .where({title})
+                .table("articles");
+            const article_id = selectArticle[0].id;
+
+            const response = await editArticleByIdOrSlug(
+                article_id,
+                undefined,
+                undefined,
+                undefined,
+                undefined
+            );
+            expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
         }
     });
 
     it("Should not edit an article with parameters that has more characters than allowed", async () => {
+        const { title } = editArticle1;
+
         try {
-            
+            const selectArticle = await connection.select()
+                .where({title})
+                .table("articles");
+            const article_id = selectArticle[0].id;
+
+            const response = await editArticleByIdOrSlug(
+                article_id,
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+                "article theoretically has unlimited characters, so don't need to test",
+                1
+            );
+            expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
         }
     });
 
     it("Should not edit an article slug to some other that already exists", async () => {
+        const { title } = editArticle1;
+        const titleThatAlreadyExists = successArticle.title;
+
         try {
-            
+            const selectArticle = await connection.select()
+                .where({title})
+                .table("articles");
+            const article_id = selectArticle[0].id;
+
+            const response = await editArticleByIdOrSlug(
+                article_id,
+                titleThatAlreadyExists,
+                "This slug already exists.",
+                "Lorem Ipsum",
+                1
+            );
+            expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
         }
@@ -405,16 +577,32 @@ describe("Articles PATCH tests", () => {
 
 describe("Articles DELETE tests", () => {
     it("Should successfully delete an article by ID and return the 200 status code", async () => {
+        const { title } = deleteArticle1;
+
         try {
-            
+            const selectArticle = await connection.select()
+                .where({title})
+                .table("articles");
+            const article_id = selectArticle[0].id;
+
+            const response = await deleteArticleByIdOrSlug(
+                article_id
+            );
+            expect(response.statusCode).toBe(200);
         } catch (error) {
             throw new Error(error as string);
         }
     });
 
     it("Should successfully delete an article by slug and return the 200 status code", async () => {
+        const { title } = deleteArticle2;
+
         try {
-            
+            const article_slug = slugify(title as string, {lower: true});
+            const response = await deleteArticleByIdOrSlug(
+                article_slug
+            );
+            expect(response.statusCode).toBe(200);
         } catch (error) {
             throw new Error(error as string);
         }
@@ -422,7 +610,10 @@ describe("Articles DELETE tests", () => {
 
     it("Should not delete an article with an invalid ID", async () => {
         try {
-            
+            const response = await deleteArticleByIdOrSlug(
+                -1
+            );
+            expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
         }
@@ -430,7 +621,10 @@ describe("Articles DELETE tests", () => {
 
     it("Should not delete an article with an invalid slug", async () => {
         try {
-            
+            const response = await deleteArticleByIdOrSlug(
+                undefined
+            );
+            expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
         }
@@ -438,7 +632,10 @@ describe("Articles DELETE tests", () => {
 
     it("Should not delete an article that doesn't exists", async () => {
         try {
-            
+            const response = await deleteArticleByIdOrSlug(
+                "ArticleThatDoesNotExist"
+            );
+            expect(response.statusCode).toBe(400);
         } catch (error) {
             throw new Error(error as string);
         }
