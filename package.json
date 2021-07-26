@@ -2,16 +2,16 @@
   "name": "blog-typescript",
   "version": "1.0.0",
   "description": "A simple blog created with TypeScript and other technologies.",
-  "main": "./build/index.js",
+  "main": "./build/instance/app.js",
   "repository": "https://github.com/NathanMBR/blog-typescript.git",
   "author": "Nathan Murillo <nathanmurillodeoliveira@gmail.com>",
   "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "test": "jest --verbose",
-    "dev": "ts-node-dev ./src/index.ts",
-    "migrate": "ts-node ./src/scripts/runMigrations.ts",
-    "start": "node ./build/index.js"
+    "dev": "ts-node-dev src/index.ts",
+    "migrate": "ts-node src/scripts/runMigrations.ts",
+    "start": "node build/index.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
