@@ -44,7 +44,7 @@ router.get("/categories/:identifier", async (req: Request, res: Response) => {
         errors.push("The ID or slug can't be undefined.");
     else {
         if (typeof identifier === "number" && identifier < 1)
-            errors.push("The ID can't be less than 1.");
+            errors.push("The ID can't be lesser than 1.");
         else
             if(typeof identifier === "string" && identifier.length > max)
                 errors.push(`The slug is too long (must have a maximum of ${max} characters).`);
@@ -85,7 +85,7 @@ router.post("/categories", isLogged, isAdmin, async (req: Request, res: Response
     const { category } = req.body;
     const errors: Array<string> = [];
     const { max } = categoriesLengths.category;
-    const { id } = JSON.parse(req.headers.user as string);
+    const { id } = JSON.parse(req.headers.user as string); // author_id
 
     // Validations
     if (!category)
@@ -149,9 +149,10 @@ router.patch("/categories/:identifier", isLogged, isAdmin, async (req: Request, 
     else {
         if (typeof identifier === "number" && identifier < 1)
             errors.push("The ID can't be less than 1.");
-        else
-            if(typeof identifier === "string" && identifier.length > max)
-                errors.push(`The slug is too long (must have a maximum of ${max} characters).`);
+        else if (typeof identifier === "string" && identifier.length > max)
+            errors.push(`The slug is too long (must have a maximum of ${max} characters).`);
+        else if (typeof identifier !== "number" && typeof identifier !== "string")
+            errors.push("The ID or slug is invalid.");
     }
 
     if (!category)
