@@ -15,6 +15,9 @@ router.use("/", loginRouter);
 import { router as categoriesRouter } from "./categories/categories.route";
 router.use("/", categoriesRouter);
 
+import { router as articlesRouter } from "./articles/articles.route";
+router.use("/", articlesRouter);
+
 router.all("/*", (_req: Request, res: Response) => {
     res.sendStatus(404);
 });
