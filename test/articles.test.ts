@@ -148,7 +148,7 @@ const deleteArticleByIdOrSlug = async (
     identifier: ArticleFormData
 ) => new Promise<SuperTestResponse>(async (resolve: Function, reject: Function) => {
     try {
-        const response = await request.patch(`/articles/${identifier}`)
+        const response = await request.delete(`/articles/${identifier}`)
             .set("authorization", jwtToken);
         resolve(response);
     } catch (error) {
@@ -397,8 +397,8 @@ describe("Articles POST tests", () => {
     it("Should not create an article with parameters that has more characters than allowed", async () => {
         try {
             const response = await createArticle(
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
                 "article theoretically has unlimited characters, so don't need to test",
                 1
             );
@@ -508,11 +508,9 @@ describe("Articles PATCH tests", () => {
     });
 
     it("Should not edit an article with invalid parameters", async () => {
-        const { title } = editArticle1;
-
         try {
             const selectArticle = await connection.select()
-                .where({title})
+                .where({title: "Edited Article 1"})
                 .table("articles");
             const article_id = selectArticle[0].id;
 
@@ -530,18 +528,16 @@ describe("Articles PATCH tests", () => {
     });
 
     it("Should not edit an article with parameters that has more characters than allowed", async () => {
-        const { title } = editArticle1;
-
         try {
             const selectArticle = await connection.select()
-                .where({title})
+                .where({title: "Edited Article 1"})
                 .table("articles");
             const article_id = selectArticle[0].id;
 
             const response = await editArticleByIdOrSlug(
                 article_id,
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
                 "article theoretically has unlimited characters, so don't need to test",
                 1
             );
@@ -552,12 +548,11 @@ describe("Articles PATCH tests", () => {
     });
 
     it("Should not edit an article slug to some other that already exists", async () => {
-        const { title } = editArticle1;
         const titleThatAlreadyExists = successArticle.title;
 
         try {
             const selectArticle = await connection.select()
-                .where({title})
+                .where({title: "Edited Article 1"})
                 .table("articles");
             const article_id = selectArticle[0].id;
 
