@@ -18,6 +18,13 @@ router.use("/", categoriesRouter);
 import { router as articlesRouter } from "./articles/articles.route";
 router.use("/", articlesRouter);
 
+// API Documentation
+import { serve, setup } from "swagger-ui-express";
+import { load } from "yamljs";
+import path from "path";
+router.use("/api-docs", serve, setup(load(path.resolve(__dirname + "../../../swagger.yml"))));
+
+// 404 error for not found pages
 router.all("/*", (_req: Request, res: Response) => {
     res.sendStatus(404);
 });
