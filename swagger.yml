@@ -1,0 +1,592 @@
+openapi: 3.0.0
+info:
+  title: TypeScript Blog
+  description: A simple blog created with TypeScript and other technologies.
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://mit-license.org/
+  contact:
+    email: nathanmurillodeoliveira@gmail.com
+paths:
+  /signup:
+    post:
+      summary: Registers an account
+      description: >-
+        This route is responsible for register new accounts in the database.
+      tags:
+        - Users
+      requestBody:
+        description: Data needed to register an account
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreation"
+            examples:
+              Andrew:
+                summary: Creating an account named Andrew
+                value:
+                  name: Andrew
+                  email: andrew.boy@gmail.com
+                  confirmEmail: andrew.boy@gmail.com
+                  password: HiMyNameIsAndrew
+                  confirmPassword: HiMyNameIsAndrew
+              Anna:
+                summary: Creating an account named Anna
+                value:
+                  name: Anna
+                  email: anna.girl@hotmail.com
+                  confirmEmail: anna.girl@hotmail.com
+                  password: HiMyNameIsAnna
+                  confirmPassword: HiMyNameIsAnna
+              Gamer:
+                summary: Creating an gamer account
+                value:
+                  name: xXxInsaneGamerXxX
+                  email: xxx.insane.gamer.xxx@yahoo.com
+                  confirmEmail: xxx.insane.gamer.xxx@yahoo.com
+                  password: password
+                  confirmPassword: password
+      responses:
+        400:
+          description: "Bad Request - some parameter(s) doesn't passed the validation rules."
+        500:
+          description: "Internal Server Error - something went wrong with the internal server processes."
+        201:
+          description: "Created - the category has been successfully created."
+  /login:
+    post:
+      summary: Authenticates to an account
+      description: >-
+        This route is responsible for authenticate an user to an account.
+        The response of this route is a JWT code.
+      tags:
+        - Users
+      requestBody:
+        description: Data needed to be authenticated
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAuthentication"
+            examples:
+              Andrew:
+                summary: Authenticating with Andrew account
+                value:
+                  email: andrew.boy@gmail.com
+                  password: HiMyNameIsAndrew
+              Anna:
+                summary: Authenticating with Anna account
+                value:
+                  email: anna.girl@hotmail.com
+                  password: HiMyNameIsAnna
+              Gamer:
+                summary: Authenticating with gamer account
+                value:
+                  email: xxx.insane.gamer.xxx@yahoo.com
+                  password: password
+      responses:
+        400:
+          description: "Bad Request - some parameter(s) doesn't passed the validation rules."
+        500:
+          description: "Internal Server Error - something went wrong with the internal server processes."
+        200:
+          description: "OK - the server returned the data correctly"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+              examples:
+                Generic:
+                  summary: Generic JWT (HS512)
+                  value:
+                    token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.VFb0qJ1LRg_4ujbZoRMXnVkUgiuKq5KxWqNdbKq_G9Vvz-S1zZa9LPxtHWKa64zDl2ofkT8F6jBt_K4riU-fPg
+  /categories:
+    get:
+      summary: Gets the data of all categories
+      description: >-
+        This route is responsible for providing all data about categories. The
+        route is divided into pages, which return a maximum of 10 categories
+        each by default.
+      parameters:
+        - in: query
+          name: page
+          description: Specifies the current pagination of the response.
+          default: 1
+          schema:
+            type: integer
+      responses:
+        500:
+          description: "Internal Server Error - something went wrong with the internal server processes."
+        200:
+          description: "OK - the server returned the data correctly"
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: "#/components/schemas/CategoryResponse"
+              example:
+                - id: 1
+                  category: Movies
+                  author_id: 1
+                  slug: movies
+                  created_at: 2021-07-27T15:49:46.533Z
+                  is_deleted: false
+                - id: 2
+                  category: Animes
+                  author_id: 1
+                  slug: animes
+                  created_at: 2021-07-27T15:49:46.533Z
+                  is_deleted: false
+      tags:
+        - Categories
+    post:
+      summary: Creates a new category
+      description: >-
+        This route is responsible for creating new categories.
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Data needed to create a category
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryCreation"
+            examples:
+              Movies:
+                summary: Adding movies category
+                value:
+                  category: Movies
+              Animes:
+                summary: Adding animes category
+                value:
+                    category: Animes
+      responses:
+        400:
+          description: "Bad Request - some parameter(s) doesn't passed the validation rules."
+        401:
+          description: "Unauthorized - you're not logged in or you aren't an administrator."
+        500:
+          description: "Internal Server Error - something went wrong with the internal server processes."
+        201:
+          description: "Created - the category has been successfully created."
+  /categories/{identifier}:
+    get:
+      summary: Gets the data of one specific category
+      description: >-
+        This route is responsible for providing the data about one specific category.
+        The category is specified by an identifier, which can be an integer (ID) or a string (slug).
+      tags:
+        - Categories
+      parameters:
+        - in: path
+          name: identifier
+          description: Specifies only one category to be searched.
+          required: true
+          schema:
+            type: string
+      responses:
+        400:
+          description: "Bad Request - some parameter(s) doesn't passed the validation rules."
+        500:
+          description: "Internal Server Error - something went wrong with the internal server processes."
+        200:
+          description: "OK - the server returned the data correctly"
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: "#/components/schemas/CategoryResponse"
+              examples:
+                Movies:
+                  summary: Getting movies category
+                  value:
+                    id: 1
+                    category: Movies
+                    author_id: 1
+                    slug: movies
+                    created_at: 2021-07-27T15:49:46.533Z
+                    is_deleted: false
+                Animes:
+                  summary: Getting animes category
+                  value:
+                    id: 2
+                    category: Animes
+                    author_id: 1
+                    slug: animes
+                    created_at: 2021-07-27T15:49:46.533Z
+                    is_deleted: false
+    patch:
+      summary: Updates the data of one specific category
+      description: >-
+        This route is responsible to update the data of one specific category.
+        The category is specified by an identifier, which can be an integer (ID) or a string (slug).
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: identifier
+          description: Specifies only one category to be updated.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Data needed to update an category.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryCreation"
+            examples:
+              Movies:
+                summary: Changing movies to movies and series
+                value:
+                  category: Movies and series
+              Animes:
+                summary: Changing animes to the singular form
+                value:
+                  category: Anime
+      responses:
+        400:
+          description: "Bad Request - some parameter(s) doesn't passed the validation rules."
+        401:
+          description: "Unauthorized - you're not logged in or you aren't an administrator."
+        500:
+          description: "Internal Server Error - something went wrong with the internal server processes."
+        200:
+          description: "OK - the server returned the data correctly"
+    delete:
+      summary: Sets one specific category as deleted
+      description: >-
+        This route is responsible to set one specific category as deleted in the database.
+        The category is specified by an identifier, which can be an integer (ID) or a string (slug).
+        This action doesn't really deletes the data, since it can be useful for future reference.
+        Note that data marked as deleted cannot be found by any route or internal process.
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: identifier
+          description: Specifies only one category to be marked as deleted.
+          required: true
+          schema:
+            type: string
+  /articles:
+    get:
+      summary: Gets the data of all articles
+      description: >-
+        This route is responsible for providing all data about articles. The
+        route is divided into pages, which return a maximum of 10 articles
+        each by default.
+      tags:
+        - Articles
+      parameters:
+        - in: query
+          name: page
+          description: Specifies the current pagination of the response.
+          default: 1
+          schema:
+            type: integer
+      responses:
+        500:
+          description: "Internal Server Error - something went wrong with the internal server processes."
+        200:
+          description: "OK - the server returned the data correctly"
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: "#/components/schemas/ArticleResponse"
+              example:
+                - id: 1
+                  title: Best Hero Movies List
+                  description: This article is a list of the best hero movies.
+                  article: "1st: Spider-man, 2nd: Batman, 3rd: Avengers"
+                  category_id: 1
+                  author_id: 1
+                  slug: best-hero-movies-list
+                  created_at: 2021-07-27T15:49:46.533Z
+                  is_deleted: false
+                - id: 2
+                  title: Spider-man review
+                  description: Review of the trilogy
+                  article: Very good
+                  category_id: 1
+                  author_id: 1
+                  slug: spider-man-review
+                  created_at: 2021-07-27T15:49:46.533Z
+                  is_deleted: false
+                - id: 3
+                  title: Favorites animes list
+                  description: This article is a list of the favorite animes of the API creator.
+                  article: "1st: Hunter x Hunter, 2nd: Fullmetal Alchemist Brotherhood, 3rd: Steins;Gate"
+                  category_id: 2
+                  author_id: 1
+                  slug: favorites-animes-list
+                  created_at: 2021-07-27T15:49:46.533Z
+                  is_deleted: false
+                - id: 4
+                  title: The best battles of Hunter x Hunter
+                  description: A selection of the best fights
+                  article: "1st: Netero vs. Meruem, 2nd: Zeno and Silva vs. Chrollo, 3rd: Kurapika vs. Uvogin"
+                  category_id: 2
+                  author_id: 1
+                  slug: the-best-battles-of-hunter-x-hunter
+                  created_at: 2021-07-27T15:49:46.533Z
+                  is_deleted: false
+    post:
+      summary: Creates a new article
+      description: >-
+        This route is responsible for creating new articles.
+      tags:
+        - Articles
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Data needed to create an article
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArticleCreation"
+            examples:
+              Movies:
+                summary: Adding an article about movies
+                value:
+                  title: Meet the movies that made more than U$1 million
+                  description: An article about movies that made lots of money.
+                  article: Lorem Ipsum...
+                  category_id: 1
+              Animes:
+                summary: Adding an article about animes
+                value:
+                  title: Meet the animes that will release this winter
+                  description: An article about the animes that will be released this winter.
+                  article: Lorem Ipsum...
+                  category_id: 2
+      responses:
+        400:
+          description: "Bad Request - some parameter(s) doesn't passed the validation rules."
+        401:
+          description: "Unauthorized - you're not logged in or you aren't an administrator."
+        500:
+          description: "Internal Server Error - something went wrong with the internal server processes."
+        201:
+          description: "Created - the article has been successfully created."
+  /articles/{identifier}:
+    get:
+      summary: Gets the data of one specific article
+      description: >-
+        This route is responsible for providing the data about one specific article.
+        The article is specified by an identifier, which can be an integer (ID) or a string (slug).
+      tags:
+        - Articles
+      parameters:
+        - in: path
+          name: identifier
+          description: Specifies only one article to be searched.
+          required: true
+          schema:
+            type: string
+      responses:
+        400:
+          description: "Bad Request - some parameter(s) doesn't passed the validation rules."
+        500:
+          description: "Internal Server Error - something went wrong with the internal server processes."
+        200:
+          description: "OK - the server returned the data correctly"
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: "#/components/schemas/ArticleResponse"
+              examples:
+                Movies:
+                  summary: Getting movies article
+                  value:
+                    id: 1
+                    title: Meet the movies that made more than U$1 million
+                    description: An article about movies that made lots of money.
+                    article: Lorem Ipsum...
+                    category_id: 1
+                    author_id: 1
+                    slug: meet-the-movies-that-made-more-than-udollar1-million
+                    created_at: 2021-07-27T23:15:28.359Z
+                    is_deleted: false
+                Animes:
+                  summary: Getting animes category
+                  value:
+                    id: 2
+                    title: Meet the animes that will release this winter
+                    description: An article about the animes that will be released this winter.
+                    article: Lorem Ipsum...
+                    category_id: 2
+                    author_id: 1
+                    slug: meet-the-animes-that-will-release-this-winter
+                    created_at: 2021-07-27T23:15:28.359Z
+                    is_deleted: false
+    patch:
+      summary: Updates the data of one specific article
+      description: >-
+        This route is responsible to update the data of one specific article.
+        The article is specified by an identifier, which can be an integer (ID) or a string (slug).
+      tags:
+        - Articles
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: identifier
+          description: Specifies only one article to be updated.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Data needed to update an article.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArticleCreation"
+            examples:
+              Movies:
+                summary: Changing the movies article
+                value:
+                  title: Meet the movies that didn't made even U$10.000
+                  description: An article about movies that didn't made lots of money.
+                  article: Lorem Ipsum...
+                  category_id: 1
+              Animes:
+                summary: Changing the animes article
+                value:
+                  title: Meet the animes that will release this summer
+                  description: An article about the animes that will be released this summer.
+                  article: Lorem Ipsum...
+                  category_id: 2
+      responses:
+        400:
+          description: "Bad Request - some parameter(s) doesn't passed the validation rules."
+        401:
+          description: "Unauthorized - you're not logged in or you aren't an administrator."
+        500:
+          description: "Internal Server Error - something went wrong with the internal server processes."
+        200:
+          description: "OK - the server returned the data correctly"
+    delete:
+      summary: Sets one specific article as deleted
+      description: >-
+        This route is responsible to set one specific article as deleted in the database.
+        The article is specified by an identifier, which can be an integer (ID) or a string (slug).
+        This action doesn't really deletes the data, since it can be useful for future reference.
+        Note that data marked as deleted cannot be found by any route or internal process.
+      tags:
+        - Articles
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: identifier
+          description: Specifies only one article to be marked as deleted.
+          required: true
+          schema:
+            type: string
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    UserCreation:
+      type: object
+      properties:
+        name:
+          type: string
+          required: true
+        email:
+          type: string
+          required: true
+        confirmEmail:
+          type: string
+          required: true
+        password:
+          type: string
+          required: true
+        confirmPassword:
+          type: string
+          required: true
+    UserAuthentication:
+      type: object
+      properties:
+        email:
+          type: string
+          required: true
+        password:
+          type: string
+          required: true
+    CategoryCreation:
+      type: object
+      properties:
+        category:
+          type: string
+          required: true
+    CategoryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        category:
+          type: string
+        author_id:
+          type: integer
+        slug:
+          type: string
+        created_at:
+          type: string
+        is_deleted:
+          type: boolean
+    ArticleCreation:
+      type: object
+      properties:
+        title:
+          type: string
+          required: true
+        description:
+          type: string
+          required: true
+        article:
+          type: string
+          required: true
+        category_id:
+          type: integer
+          required: true
+    ArticleResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        article:
+          type: string
+        category_id:
+          type: integer
+        author_id:
+          type: integer
+        slug:
+          type: string
+        created_at:
+          type: string
+        is_deleted:
+          type: boolean
