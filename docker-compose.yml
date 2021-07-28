@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+    ${PG_HOST}:
+        image: postgres:13.3-alpine3.14
+        restart: "no"
+        environment:
+            POSTGRES_PASSWORD: ${PG_PASSWORD}
+            POSTGRES_DB: ${PG_DB}
+        ports:
+            - ${PG_PORT}:5432
+    backend:
+        build: .
+        restart: "no"
+        command: npm run start
+        ports:
+            - ${APP_PORT}:${APP_PORT}
+        depends_on:
+            - ${PG_HOST}
