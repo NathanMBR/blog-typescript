@@ -31,7 +31,7 @@ Here's a little guide to help you to configure your `.env` file.
 | `PG_PASSWORD*` | Defines the password to authenticate into the database. |
 | `PG_DB*` | Defines the database name that the API will use. |
 
-*The `_DEV` parameters acts the same way as their correspondents above quoted. The difference between then is that the `_DEV` parameters are used only when the `APP_MODE` is set to *development*.
+*The `_DEV` parameters acts the same way as their correspondents above quoted. The difference between them is that the `_DEV` parameters are used only when the `APP_MODE` is set to *development*.
 
 ### _Docker setup_
 If you choose to use Docker, all you need to do is to run the composer command: `docker compose up`. You don't need to create a database inside the Postgres image, because it's configured to do that automatically. If you want to use Docker only to isolate the API, you can build an image using Dockerfile, but be sure to configure a PostgreSQL database by your own. After that, you need to run two commands: `docker container ls`, where you'll copy the API container ID, and `docker container exec <API_container_ID> npm run migrate`, to automatically create the tables into the database.
