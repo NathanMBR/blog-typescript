@@ -9,6 +9,7 @@ You can access the API documentation at the `/api-docs` route.
 ### _Requirements_
 * Git
 * Node.js
+* npm (v7 or greater) or Yarn
 * PostgreSQL or Docker
 
 ### _Installing_
