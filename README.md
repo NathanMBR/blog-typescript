@@ -1,11 +1,21 @@
 # TypeScript Blog API
 This is a simple blog API made with Node.js, TypeScript, Jest, Docker, PostgreSQL, Express, JWT and other technologies.
 
+### _Index_
+1. [Documentation](https://github.com/NathanMBR/blog-typescript#documentation)
+2. [First steps](https://github.com/NathanMBR/blog-typescript#first-steps)
+3. [Requirements](https://github.com/NathanMBR/blog-typescript#requirements)
+4. [Installing](https://github.com/NathanMBR/blog-typescript#installing)
+5. [Dotenv file configuration](https://github.com/NathanMBR/blog-typescript#dotenv-file-configuration)
+6. [Docker setup](https://github.com/NathanMBR/blog-typescript#docker-setup)
+7. [PostgreSQL setup](https://github.com/NathanMBR/blog-typescript#postgresql-setup)
+8. [Using the API](https://github.com/NathanMBR/blog-typescript#using-the-api)
+9. [Testing](https://github.com/NathanMBR/blog-typescript#testing)
+
 ## Documentation
 You can access the API documentation at the `/api-docs` route.
 
 ## First steps
-
 ### _Requirements_
 * Git
 * Node.js
